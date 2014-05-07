@@ -200,7 +200,7 @@ class parecer
 			";
 			$rlt = db_query($sql);
 			
-			$sx .= '<TR><TH>Protocolo<TH>Avaliador<TH>Situação<TH>Atualizado<TH>ação';
+			$sx .= '<TR><TH>Protocolo<TH>Avaliador<TH>Ação<TH>Situação<TH>Atualizado<TH>ação';
 			while ($line = db_read($rlt))
 			{
 				$link = '<span class="link" onclick="newxy2(\'parecer_resultado.php?dd0='.$line['id_pp'].'&dd90='.checkpost($line['id_pp']).'\')">';
@@ -212,6 +212,7 @@ class parecer
 				$sx .= trim($line['pp_protocolo']);				
 				$sx .= '<TD class="tabela01">';
 				$sx .= trim($line['us_nome']);
+				$sx .= '<TD class="tabela01" align="center">&nbsp;';
 				$sx .= '<TD class="tabela01" align="center">';
 				$sx .= $this->show_status(trim($line['pp_status']));
 				$sx .= '<TD class="tabela01" align="center">';
@@ -248,9 +249,14 @@ class parecer
 					$sx .= '<TD class="tabela01">'.$line['pp_protocolo'];
 					$sx .= '<TD class="tabela01">'.$line['us_nome'];
 					$sx .= '<TD class="tabela01" align="center">';
-					$sx .= '<span class="link" onclick="mostrar(\'#dv'.$ida.'\');">';
-					$sx .= $this->show_status(trim($line['pp_status']));
-					$sx .= '</span>';
+					
+					if (($line['pp_status'] == '@') or ($line['pp_status'] == 'A')) 
+						{
+							$linkd = '<A href="#" onclick="newxy2(\'parecer_declinar.php?dd0='.$line['id_pp'].'&dd1='.$this->tabela.'\',600,400);" class="link">Declinar</A>';
+							$sx .= $linkd;
+						}
+					$sx .= '<TD class="tabela01" align="center">';		
+					$sx .= $this->show_status(trim($line['pp_status']));					
 					
 					$sta = $line['pp_status']=='B';
 					$sa = '';
@@ -280,10 +286,7 @@ class parecer
 					}
 				function declinar(v1,v2)
 					{
-						var divs = \'#dv\'+v1;
-						alert(divs);
-						alert(v2);
-						$(divs).html(\'declinado\');
+						newxy2(\'parecerista_declinar.php?dd0=\'+v1);
 					}
 				</script>
 			';
@@ -340,18 +343,20 @@ class parecer
 							$check = checkpost($ida.$secu);
 							$linkc = ' onclick="$(\'#av'.$ida.'\').animate({ height:\'toggle\', },300);" ';
 							$sta = $link.'<font color="green" '.$linkc.' style="cursor: pointer;">Aberto</font></A>';
-							$div_status = '<div id="av'.$ida.'" style="display: none;">
-											<input type="button" value="declinar" class="botao-geral" 
-												onclick="declinar('.$ida.',\''.$check.'\');">
-											</div>';
 							 
 						}
 					$sx .= '<TR valign="top" class="tabela01">';
 					$sx .= '<TD class="tabela01">'.$line['us_nome'];
 					$sx .= '<TD class="tabela01" align="center">';
-					$sx .= '<span class="link" onclick="mostrar(\'#dv'.$ida.'\');">';
+
+					if (($line['pp_status']=='@') or ($line['pp_status']=='A'))
+						{
+						$linkd = '<A href="#" onclick="newxy2(\'parecer_declinar.php?dd0='.$line['id_pp'].'&dd1='.$this->tabela.'\',600,400);" class="link">Declinar</A>';
+						$sx .= $linkd;
+						}
+					
+					$sx .= '<TD class="tabela01" align="center">';
 					$sx .= $this->show_status(trim($line['pp_status']));
-					$sx .= '</span>';
 					$link = '';
 					$sta = $line['pp_status']=='B';
 					if ($sta == 'B' or $sta == 'C')
@@ -379,8 +384,6 @@ class parecer
 				function declinar(v1,v2)
 					{
 						var divs = \'#dv\'+v1;
-						alert(divs);
-						alert(v2);
 						$(divs).html(\'declinado\');
 					}
 				</script>
