@@ -1,5 +1,6 @@
 <?php
 /* 
+ * 08/05/2014 - Mudança do metodo upload_form
  * 03/04/2013 - Inclusão da ordem nos arquivo order by doc_data desc, doc_hora desc
  * file_status 03/02/2014
  */ 
@@ -119,7 +120,7 @@ class ged
 		function upload_form($tp='',$bt='')
 			{
 				if (strlen($bt)==0) { $bt=msg('upload'); }
-				$link = "newxy2('ged_upload.php?dd1=".$this->protocol."&dd2=".$tp."',600,400);";
+				$link = "newxy2('ged_upload.php?dd1=".$this->protocol."&dd2=".$tp."&dd50=".$this->tabela."',600,400);";
 				$link = '<input type="button" value="'.$bt.'" onclick="'.$link.'" class="botao-confirmar">';
 				return($link); 
 			}			
@@ -769,6 +770,7 @@ class ged
   						doc_size float,
   						doc_versao char(4),
   						doc_ativo integer
+  						doc_user char(20),
 						) ";
 				$rlt = db_query($sql);
 						
