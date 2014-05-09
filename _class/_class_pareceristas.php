@@ -345,6 +345,100 @@ class parecerista
 				$sx .= '</table>';
 				return($sx);
 			}		
+		function lista_avaliadore_externos_jnl()
+			{
+				global $jid;
+				/*				
+				$sql = "update pibic_professor set pp_avaliador = 0";
+				$rlt = db_query($sql);
+				$sql = "update pibic_professor set pp_avaliador = 1 
+						where pp_titulacao = '002' and pp_update = '".date("Y")."' ";
+				$rlt = db_query($sql);
+				 */
+						
+				$sql = "select * from (
+						select * from ".$this->tabela." 
+						left join instituicoes on inst_codigo = us_instituicao
+						where us_journal_id = ".round($jid)."
+						and us_ativo = 1
+						) as tabela "; 
+						
+				$sql .= " left join pareceristas_area on pa_parecerista = us_codigo ";
+				$sql .= " left join ajax_areadoconhecimento on pa_area = a_codigo ";
+				$sql .= " order by us_nome, a_cnpq ";						
+		
+				$rlt = db_query($sql);
+				$sx = '<table width="100%">';
+				$sx .= '<H2>Avaliadores Externos/IC</h2>';
+				$sx .= '<TR><TH>Cracha<TH>Títul.<TH>Nome<TH>Instituição<TH>Status<TH>Convite<TH>Atualizado';
+				$id = 0;
+				$xpp = ''; 
+				$status = $this->status();
+				while ($line = db_read($rlt))
+					{
+						$cor = '';
+						$pp = trim($line['us_codigo']);
+						if (($pp != $xpp) and (strlen($pp) == 7))
+						{
+							$acc = $line['us_aceito'];
+							switch ($acc)
+								{
+									case '0':
+										$cor = ' bgcolor="#FFC0C0" ';
+										break;
+									case '2':
+										$cor = ' bgcolor="#FFFFc0" ';
+										break;																			
+									case '10':
+										$cor = ' bgcolor="#C0FFC0" ';
+										break;
+										
+									case '19':
+										$cor = ' bgcolor="#FFFFc0" ';
+										break;
+									
+									default:
+										$cor = ' bgcolor="#C0C0C0" ';
+										break;
+								}
+							
+							$id++;
+							$av = $line['us_ativo'];
+							$email = trim($line['us_email']);
+							if (strlen($email)==0) { $email = '<font color="red">==SEM EMAIL==</font>'; }
+							if ($av==1) { $av = '<font color="green">'.msg('ativo').'</font>'; }
+							else { $av = '<font color="red">'.msg('inativo').'</font>'; }
+							$link = '<A HREF="pareceristas_detalhes.php?dd0='.$line['id_us'].'" class="link">';
+							$sx .= '<TR '.$cor.'>';
+							$sx .= '<TD class="tabela01" align="center">';
+							$sx .= $link;
+							$sx .= $line['us_codigo'];
+							$sx .= '</A>';
+							$sx .= '<TD class="tabela01">';
+							$sx .= $line['us_titulacao'].' ';
+							$sx .= '<TD class="tabela01">';
+							$sx .= $line['us_nome'];
+							$sx .= '<BR>'.$email;
+							$sx .= '('.$line['us_aceito'].')-('.$line['us_ativo'].')';
+							$sx .= '<TD class="tabela01">';
+							$sx .= $line['inst_nome'];
+							$sx .= '<TD class="tabela01" align="center">';
+							$sx .= $av;
+							$xpp = $pp;
+							$sx .= '<TD class="tabela01">'.$line['us_bolsista'];
+							$sx .= '<TD class="tabela01">'.$status[$line['us_aceito']].' ('.$line['us_aceito'].')';
+							$sx .= '<TD class="tabela01">'.stodbr($line['us_aceito_resp']);
+							
+						}
+					if ($line['a_semic']==1)
+						{
+						$sx .= '<TR><TD><TD colspan=2>'.$line['a_cnpq'].' - '.$line['a_descricao'];
+						}
+					}
+				$sx .= '<TR><TD colspan=5>Total '.$id;
+				$sx .= '</table>';
+				return($sx);
+			}		
 		function cp()
 			{
 				global $jid;
@@ -363,7 +457,7 @@ class parecerista
 				array_push($cp,array('$A4','','Dados para o sistema',False,True,''));
 				array_push($cp,array('$H8','us_login','Login',False,True,''));
 				array_push($cp,array('$H8','us_senha','senha',False,True,''));
-				array_push($cp,array('$O -1:Excluído&10:SIM, Convite Novo Aceito&1:Limbo de aceite&0:NÃO&9:Enviar convite&2:Aguardando aceite do convite&3:inativo temporariamente&11:SIM, aceito convite via e-mail CNPq','us_aceito','Aceito com parecerista',False,True,''));
+				array_push($cp,array('$O -1:Excluído&10:SIM, Convite Novo Aceito&1:Limbo de aceite&0:NÃO&9:Enviar convite&2:Aguardando aceite do convite&3:inativo temporariamente&11:SIM, aceito temporáro aceito (falta validar)','us_aceito','Aceito com parecerista',False,True,''));
 				array_push($cp,array('$U8','us_lastupdate','us_lastupdate',False,True,''));
 				array_push($cp,array('$S100','us_lembrete','Lembrete da senha',False,True,''));
 				array_push($cp,array('$H4','','Documentos pessoais',False,True,''));
@@ -1516,7 +1610,7 @@ class parecerista
 		function status()
 			{		
 				$ar = array(
-					'1'=>'Convite aceito',
+					'1'=>'Convite temporário aceito (validar)',
 					'2'=>'Aguardando resposta',
 					'3'=>'Recusado temporariamente',
 					'9'=>'Enviar convite',
@@ -1524,7 +1618,7 @@ class parecerista
 					'0'=>'Não, convite não aceito',
 					'19'=>'Convite novo enviado',
 					'10'=>'SIM, Convite Novo Aceito',
-					'11'=>'Convite aceito via CNPq'
+					'11'=>'Convite aceito via CNPq (temporário)'
 					);
 				return($ar);
 			}

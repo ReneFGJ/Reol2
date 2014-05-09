@@ -41,7 +41,7 @@ if (strlen($dd[4]) > 0)
 		//$par->lista_professores_ic_enviar_email();
 	} else {
 		echo $par->resumo_avaliadore_externos();		
-		echo $par->lista_avaliadore_externos_ic();
+		echo $par->lista_avaliadore_externos_jnl();
 	}
 echo '</div>';
 require("../foot.php");	
