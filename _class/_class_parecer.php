@@ -34,7 +34,7 @@ class parecer
 			$it = array(0,0,0,0,0,0);
 			$itl = array();
 			array_push($itl,'<a href="'.$http.'submissao_parecer.php?dd1=A"><font color="#000000">');
-			$cp = 'pp_parecer_data, journal_id, pp_protocolo, pp_status, us_nome, us_codigo';
+			$cp = 'id_pp,pp_parecer_data, journal_id, pp_protocolo, pp_status, us_nome, us_codigo';
 			$sql = "select ".$cp." from reol_parecer_enviado 
 						left join pareceristas on pp_avaliador = us_codigo
 						inner join submit_documento on pp_protocolo = doc_protocolo
@@ -82,7 +82,8 @@ class parecer
 						else { $sa .= 'hoje'; }		
 					$livre = 'liberar declaração';
 					$sa .= '<TD class="tabela01" align="center">';
-					$sa .= $livre;
+					$slink = '<span class="link" onclick="newxy2(\'parecer_declaracao_liberar.php?dd0='.$line['id_pp'].'&dd1='.$this->tabela.'&dd90='.checkpost($line['id_pp'].$this->tabela).'\',300,300);" style="cursor: pointer;">';
+					$sa .= $slink.$livre.'</span>';
 				}
 			$sa .= '</table>';
 			

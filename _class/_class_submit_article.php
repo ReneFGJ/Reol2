@@ -1233,6 +1233,13 @@ class submit
 					array_push($sn,'C');
 					array_push($sn,'E');
 					break;
+				case 'O': 
+					array_push($sn,'C');
+					array_push($sn,'N');
+					array_push($sn,'G');
+					array_push($sn,'X');
+					array_push($sn,'E');
+					break;					
 				case 'Z': 
 					array_push($sn,'C');
 					break;														

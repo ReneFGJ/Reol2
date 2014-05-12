@@ -2,6 +2,7 @@
 require("cab.php");
 
 require($include.'sisdoc_data.php');
+require($include.'sisdoc_windows.php');
 
 echo $hd->menu();
 echo '<div id="conteudo">';
