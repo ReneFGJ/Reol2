@@ -354,6 +354,25 @@ class dtd_mark
 				$sx .= '</form>';
 				return($sx);
 			}
+
+		function show_button_reprocessar($id)
+			{
+				$sx = '<form method="get" action="producao_dtd_process.php">';
+				$sx .= '<input type="hidden" name="dd0" value="'.$id.'">';
+				$sx .= '<input type="submit" value="DTD Clear/Process Cited" class="submit-geral">';
+				$sx .= '</form>';
+				return($sx);
+			}
+
+		function show_button_save($id)
+			{
+				$sx = '<form method="get" action="producao_dtd_save.php" target="new_'.date("His").'">';
+				$sx .= '<input type="hidden" name="dd0" value="'.$id.'">';
+				$sx .= '<input type="submit" value="DTD Save" class="submit-geral">';
+				$sx .= '</form>';
+				return($sx);
+			}
+
 		function load_file($file)
 			{
 						$rrr = fopen($file,'r+');

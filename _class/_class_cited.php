@@ -4,7 +4,67 @@ class cited
 	var $id;
 	var $protocolo;
 	var $tabela = "articles_cited";
+	var $tabela_city = "cited_city";
 	
+	function cited_clean($protocolo)
+		{
+			$sql = "update ".$this->tabela." set ac_dtd = '', ac_status = '@' where ac_protocolo = '$protocolo' ";
+			$rlt = db_query($sql);		
+			
+			$this->cited_process($protocolo);
+		}
+		
+	function cited_process($protocolo)
+		{
+			$sql = "select * from ".$this->tabela." where ac_protocolo = '$protocolo' order by ac_ord ";
+			$rlt = db_query($sql);
+			while ($line = db_read($rlt))
+				{
+						$id = $line['id_ac'];
+						$this->le($id);
+						$aref = trim($line['ac_ref']);
+						$tipo = trim($line['ac_tipo_obra']);
+						$autor = trim($line['ac_tipo']);
+						
+						$bref = $this->dtd_mark_start($aref,$tipo,$autor);
+						$this->save_mark($bref);
+						echo '<HR>1';						
+				}
+		}
+	
+	function cp_city()
+		{
+			$cp = array();
+			array_push($cp,array('$H8','id_cy','',False,True));
+			array_push($cp,array('$H8','cy_codigo','',False,True));
+			array_push($cp,array('$S40','cy_name','',False,True));
+			array_push($cp,array('$O 1:Sim&0:Não','cy_ativo','',False,True));
+			return($cp);
+		}
+	
+	function structure_cidade()
+		{
+			$sql = "create table cited_city
+						(
+						id_cy serial not null,
+						cy_codigo char(7),
+						cy_name char(40),
+						cy_ativo integer
+						)
+					";
+			$rlt = db_query($sql);
+		}
+	
+
+	function row_cidades()
+		{
+			global $cdf,$cdm,$masc;
+		
+			$cdf = array('id_cy','cy_codigo','cy_name','cy_codigo');
+			$cdm = array('cod','codigo','Cidade','Codigo');
+			$masc = array('','','','','','','','');
+			return(1);			
+		}
 
 	function set_tipo_autoria_multipla($ids,$tipo)
 		{
@@ -192,16 +252,125 @@ class cited
 			return($cp);
 		}
 	
+	function trata_referencia_para_dtd($ref)
+		{
+			$ref = troca($ref,chr(15),' ');
+			$ref = troca($ref,chr(13),' ');
+			$ref = troca($ref,chr(10),' ');
+			$ref = troca($ref,'  ',' ');
+			return($ref);
+		}
+	
 	function dtd_mark_start($ref,$t1='',$t2='')
 		{
-			echo '<HR>';
+			echo '=='.$t1.'=='.$t2.'<HR>';
 			if ((strlen($t1) > 0) and (strlen($t2) > 0))
 				{
+				$ref = $this->trata_referencia_para_dtd($ref);
+				$ref = troca($ref,'[dissertação]','(dissertação)');
 				$sx = '[ocitat]'.$ref.'[/ocitat]';
-				$sx = $this->dtd_no($sx);
-				$sx = $this->dtd_author($sx);
-				$sx = $this->dtd_title($sx);
-				$sx = $this->dtd_journal($sx);
+				/* Artigos */
+				if ($t1=='A')
+					{
+					$sx = $this->dtd_no($sx);
+					switch ($t2)
+							{
+								case 'A':
+									$sx = $this->dtd_author($sx);
+									$sx = $this->dtd_title($sx);
+									$sx = $this->dtd_journal($sx);
+									$sx = $this->trata_referencia_para_dtd($sx);
+									break;
+								case 'I':
+									$sx = $this->dtd_author_instituicao($sx);
+									$sx = $this->dtd_title($sx);
+									$sx = troca($sx,'[/oauthor]','[/ocorpaut]');
+									$sx = $this->dtd_journal($sx);
+									$sx = $this->trata_referencia_para_dtd($sx);
+									break;
+								default:
+									echo 'OPS AUTORIA';
+									exit;
+							}			
+					}
+				/* Outros */
+				if ($t1=='O')
+					{
+					$sx = $this->dtd_no($sx);
+					switch ($t2)
+							{
+								case 'A':
+									$sx = $this->dtd_author($sx);
+									$sx = $this->dtd_title($sx);
+									break;
+								case 'I':
+									$sx = $this->dtd_author_instituicao($sx);
+									$sx = $this->dtd_title($sx);
+									break;
+								default:
+									echo 'OPS AUTORIA';
+									exit;
+							}
+					$sx = $this->dtd_cidades($sx);
+					}								
+				/* livros / book */
+				if ($t1=='L')
+					{
+					$sx = $this->dtd_no($sx);
+					switch ($t2)
+							{
+								case 'A':
+									$sx = $this->dtd_author($sx);
+									$sx = $this->dtd_title($sx);
+									$sx = $this->dtd_journal($sx);
+									$sx = $this->trata_referencia_para_dtd($sx);
+									break;
+								case 'I':
+									$sx = $this->dtd_author_instituicao($sx);
+									$sx = $this->dtd_title($sx);
+									$sx = $this->trata_referencia_para_dtd($sx);								
+									break;
+								default:
+									echo 'OPS AUTORIA';
+									exit;
+							}
+					$sx = $this->dtd_edition($sx);
+					$ano = $this->dtd_ano_busca_livro($sx);
+					$sm = '[/pubname]; [date dateiso="'.$ano.'0000"]'.$ano.'[/date];';
+					$sx = troca($sx,'; '.$ano,$sm);					
+									
+					$sx = troca($sx,'[title]','[omonog][title]');
+					if ($t2=='I') { $sx = troca($sx,'[/oauthor]','[/ocorpaut]'); }
+					$sx = troca($sx,'[/oiserial]','[/omonog]');
+					$sx = troca($sx,'[oiserial]','[omonog]');
+					$sx = troca($sx,'[oiserial]','[omonog]');
+					
+					$sx = troca($sx,'[page]','[pubname]');
+					//$sx = troca($sx,'[/ocontrib]','');
+					$sx = troca($sx,'[/volid]','');
+					$sx = troca($sx,'[/page]','');
+					$sx = $this->dtd_cidades($sx);
+					}								
+				}
+			return($sx);
+		}
+	function dtd_cidades($sx)
+		{
+			$sql = "select * from ".$this->tabela_city." where cy_ativo = 1 order by cy_name  ";
+			$rlt = db_query($sql);
+			while ($line = db_read($rlt))
+				{
+					$ed = trim($line['cy_name']);
+					if (strpos($sx,$ed) > 0) { $sx = troca($sx,$ed,'[city]'.$ed.'[/city]'); }
+				}
+			return($sx);
+		}
+	function dtd_edition($sx)
+		{
+			for ($r=1;$r < 200;$r++)
+				{
+					$ed = trim($r).'. ed.';
+					if (strpos($sx,$ed) > 0) { $sx = troca($sx,$ed,'. [edition]'.$r.'[/edition] ed. '); }
 				}
 			return($sx);
 		}
@@ -212,6 +381,18 @@ class cited
 			while ($ok == 0)
 				{
 					if (strpos($sx,$ano.';') > 0) { return($ano); }
+					$ano--;
+					if ($ano < 1500) { return(0); }
+				}
+			return(0);
+		}
+	function dtd_ano_busca_livro($sx)
+		{
+			$ok = 0;
+			$ano = (date("Y")+5);
+			while ($ok == 0)
+				{
+					if (strpos($sx,'; '.$ano) > 0) { return($ano); }
 					$ano--;
 					if ($ano < 1500) { return(0); }
 				}
@@ -233,7 +414,7 @@ class cited
 					
 					$journal = $sn;
 					
-					$sm = '[date dateiso="'.$ano.'0000"]'.$ano.'[/date];[volid]';
+					$sm = '[date dateiso="'.$ano.'0000"]'.$ano.'[/date]; [volid]';
 					$sn = troca($sn,$ano.';',$sm);
 					
 					/* volid */
@@ -245,14 +426,22 @@ class cited
 							$issue = substr($issue,$pos+1,10);
 							$issue = substr($issue,0,strpos($issue,')'));
 							$issue = sonumero($issue);
-							$sn = troca($sn,'('.$issue.')','[/volid]([issueno]'.$issue.'[/issueno])');
+							$sn = troca($sn,'('.$issue.')','[/volid]([issueno]'.trim($issue).'[/issueno])[fn]');
 						} else {
-							echo 'OPS II';
-							exit;
+							/* sem informação do volume */
+							echo $issue;
+							$pos = strpos($issue,':'); 
+							if ( $pos > 0)
+								{
+									$issue = substr($issue,0,$pos);
+									$sn = troca($sn,$issue.':',trim($issue).'[/volid][fn]:');												
+								} else {							
+									echo 'OPS II';
+								}
 						}
 						
 					/* Pages */
-					$issue = substr($sn,strpos($sn,'[/issueno]'),strlen($sn));
+					$issue = substr($sn,strpos($sn,'[fn]'),strlen($sn));
 					$pos = strpos($issue,':');
 					
 					$page = substr($issue,$pos+1,strlen($issue));
@@ -264,25 +453,36 @@ class cited
 					/* Nome da publicacao */
 					$pos = strpos($sn,'[date');
 					$journal = trim(substr($sn,0,$pos));
-									
+					while (strpos($journal,']') > 0)
+						{ $journal = substr($journal,strpos($journal,']')+1,strlen($journal)); }
+					
+					echo '<HR>TÍTULO'.$journal.'<HR>';				
 					if (substr($journal,strlen($journal)-1,1)=='.')
 						{ $journal = substr($journal,0,strlen($journal)-1); }
-											
-					$sn = troca($sn,$journal,'[oiserial]JJJJ[/oserial]');
+								
+					$sn = troca($sn,'[fn]','');			
+					$sn = troca($sn,$journal,'[stitle]JJJJ[/stitle]');
 					$sn = troca($sn,'JJJJ',$journal);	
 					
 					$st = troca($st,$sq,$sn);
-
+					
 					return($st);
 				} else {
-					echo 'OPS';
+					echo $sx.'<HR>';
+					echo 'OPS, journal name not found';
 					exit;
 				}
 			exit;
 		}
 	function dtd_author($sx)
 		{
-			$sa = (strpos($sx,'[/no]')+5);
+			$xpos = strpos($sx,'[/no]');
+			if ($xpos == 0)
+				{
+					echo 'Não identificado N. do artigo';
+					//exit;
+				}
+			$sa = ($xpos+5);
 			$sa = substr($sx,$sa,strlen($sx));
 			$sa = substr($sa,0,strpos($sa,'.'));
 			
@@ -300,6 +500,27 @@ class cited
 				
 			return($sx);
 		}
+	function dtd_author_instituicao($sx)
+		{
+			$sa = (strpos($sx,'[/no]')+5);
+			$sa = substr($sx,$sa,strlen($sx));
+			$sa = substr($sa,0,strpos($sa,'.'));
+			
+			$author = splitx(',',$sa.',');
+			$sr = $sa;
+			
+			for ($r=0;$r < count($author);$r++)
+				{
+					$pre = '[ocontrib]';
+					if ($r > 0) { $pre = ''; }
+					$a1 = $author[$r];
+					$a2 = $pre.$this->dtd_autor_institucional($a1);
+					$sx = troca($sx,$a1,$a2);
+				}
+				
+			return($sx);
+		}
+
 	function dtd_title($sx)
 		{
 			$sn = $sx;
@@ -309,8 +530,13 @@ class cited
 				}
 			if (substr($sx,0,1)=='.') { $sx = trim(substr($sx,1,strlen($sx))); }
 			/* analisa */
-			
+
 			$title = substr($sx,0,strpos($sx,'.'));
+			
+			/* identifica o idioma */
+			$idi = new linguage;
+			$idioma = $idi->identify($title);
+			
 			/* subtitle */
 			$subtitle = '';
 			if (strpos($title,':') > 0)
@@ -322,12 +548,12 @@ class cited
 				}
 			if (strlen($subtitle) > 0)
 				{
-					$sn = troca($sn,$title,'[title language="en"]ttt[/title]');
-					$sn = troca($sn,$subtitle,'[subtitle]sss[/subtitle][/ocontrib]');
+					$sn = troca($sn,$title,'[title language="'.$idioma.'"]ttt[/title]');
+					$sn = troca($sn,$subtitle,'[subtitle]sss[/subtitle][/ocontrib][oiserial]');
 					$sn = troca($sn,'ttt',$title);
 					$sn = troca($sn,'sss',$subtitle);
 				} else {
-					$sn = troca($sn,$title,'[title language="en"]ttt[/title][/ocontrib]');
+					$sn = troca($sn,$title,'[title language="'.$idioma.'"]ttt[/title][/ocontrib][oiserial]');
 					$sn = troca($sn,'ttt',$title);
 				}
 			$sx = $sn;			
@@ -347,19 +573,31 @@ class cited
 				}
 			return($sx);
 		}
+	function dtd_autor_institucional($sa)
+		{
+			$sa = trim($sa);
+			$sx = '[ocorpaut][orgname]'.$sa.'[/orgname][/oauthor]';
+			return($sx);
+		}		
 	function dtd_no($sx)
 		{
-			$sn = substr($sx,0,strpos($sx,'.'));
-			$sn = sonumero($sn);
-			if (strlen($sn) > 0)
+			$sx = trim($sx);
+			$no = '';
+			$sc = '';
+			for ($r=0;$r < 14;$r++)
 				{
-					$posx = strpos($sx,'.');
-					if ($posx > 0)
-						{
-							$sx = troca($sx,$sn.'.','[no]'.$sn.'[/no]');
-						}
+					$ch = substr($sx,$r,1);
+					if (($ch == ' ') or ($ch == '.'))
+						{ $sc .= $ch; $r = 100; $cf = $ch; }
+					else 
+						{ $sc .= $ch; }
 				}
-			return($sx);
+				
+			$s1 = substr($sx,0,30);
+			$s2 = substr($sx,30,strlen($sx));
+			$s1 = troca($s1,$sc,'[ocitat][no]'.sonumero($sc).'[/no]');
+				
+			return($s1.$s2);
 		}
 	function show_dtd($sx)
 		{
@@ -451,6 +689,24 @@ class cited
 				';
 			return($sx);
 		}
+	function mostra_icone_tipo_obra($tp)
+		{
+			global $http;
+			switch ($tp)
+				{
+				case 'L':
+					$img = $http.'editora/img/icone_dtd_book.png';
+					break;
+				case 'A':
+					$img = $http.'editora/img/icone_dtd_journal.png';
+					break;
+				default:
+					$img = $http.'editora/img/icone_dtd_other.png';
+					break;					
+				}
+			$img = '<nobr><img src="'.$img.'" height=18">('.$tp.')</nobr>';
+			return($img);
+		}
 	function show()
 		{
 			global $dd,$acao;
@@ -467,15 +723,46 @@ class cited
 			$sx .= '<table width="100%" class="tabela00">';
 			while ($line = db_read($rlt))
 				{
-					$link = ' onclick="newxy2(\'cited_mark.php?dd0='.$line['id_ac'].'\',800,400);" ';
+					$cor = '<font color="#202020">';
+					if ($line['ac_status']=='F') { $cor = '<font color="A0A0A0">'; }
+					$tipo_obra = $line['ac_tipo_obra'];
+					$link = ' onclick="newxy2(\'cited_mark.php?dd0='.$line['id_ac'].'\',800,600);" ';
 					$sx .= '<TR valign="top">';
 					$sx .= '<TD width="2%">'.$line['ac_ord'].'.';
-					$sx .= '<TD>'.$line['ac_ref'];
-					$sx .= '<TD><A HREF="#" '.$link.'>'.$line['ac_status'].'</A></td>';
+					$sx .= '<TD>'.$cor.$line['ac_ref'].'</font>';
+					$sx .= '<TD width="2%">'.$this->mostra_icone_tipo_obra($tipo_obra);					
+					$sx .= '<TD><spam '.$link.' style="cursor: pointer;">'.$cor.$line['ac_status'].'</font>'.'</span></td>';
 				}
 			$sx .= '</table>';	
 			return($sx);			
 		}
+
+	function show_xml()
+		{
+			global $dd,$acao;
+			$protocolo = $this->protocolo;
+			$sql = "select * from ".$this->tabela." where ac_protocolo = '$protocolo' order by ac_ord ";
+			$rlt = db_query($sql);
+			$sx = '';
+			$tot = 0;
+			while ($line = db_read($rlt))
+				{
+					$sr = trim($line['ac_dtd']);
+					if (strlen($sr) > 10)
+						{
+						$tot++;
+						$sr = troca($sr,'[','<');
+						$sr = troca($sr,']','>');							
+						$sx .= $sr.chr(13).chr(10);
+						}
+				}
+			$sx = '[other standard="other" count="'.$tot.'"]'.$sx.'[/other]';
+			$sx = troca($sx,'[','<');
+			$sx = troca($sx,']','>');
+			
+			return($sx);			
+		}
+
 	function delete_cited()
 		{
 			$protocolo = $this->protocolo;
@@ -496,8 +783,6 @@ class cited
 						''
 					)
 			";
-			echo $sql;
-			echo '<HR>';
 			$rlt = db_query($sql);
 			return(1);			
 		}
