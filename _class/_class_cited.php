@@ -251,6 +251,15 @@ class cited
 			array_push($cp,array('$O : &A:Artigo de periodico&C:Capitulo Livro/Cap. Monografia&L:Livro/Monografia&O:Outros tipo','ac_tipo_obra','Tipo',True,True));
 			return($cp);
 		}
+	function cp_ref()
+		{
+			$cp = array();
+			array_push($cp,array('$H8','id_ac','',False,True));
+			array_push($cp,array('$T80:5','ac_ref','Referência',False,True));
+			array_push($cp,array('$[1-300]','ac_ord','Ordem',True,True));
+			array_push($cp,array('$O : &@:Indexar&A:Classificado&F:Finalizado&X:Cancelado	','ac_status','Status',True,True));			
+			return($cp);
+		}		
 	
 	function trata_referencia_para_dtd($ref)
 		{
@@ -727,8 +736,9 @@ class cited
 					if ($line['ac_status']=='F') { $cor = '<font color="A0A0A0">'; }
 					$tipo_obra = $line['ac_tipo_obra'];
 					$link = ' onclick="newxy2(\'cited_mark.php?dd0='.$line['id_ac'].'\',800,600);" ';
+					$linke = ' onclick="newxy2(\'cited_mark_ed.php?dd0='.$line['id_ac'].'\',800,600);" ';
 					$sx .= '<TR valign="top">';
-					$sx .= '<TD width="2%">'.$line['ac_ord'].'.';
+					$sx .= '<TD '.$linke.' style="cursor: pointer;" width="2%">'.$line['ac_ord'].'.';
 					$sx .= '<TD>'.$cor.$line['ac_ref'].'</font>';
 					$sx .= '<TD width="2%">'.$this->mostra_icone_tipo_obra($tipo_obra);					
 					$sx .= '<TD><spam '.$link.' style="cursor: pointer;">'.$cor.$line['ac_status'].'</font>'.'</span></td>';

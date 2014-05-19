@@ -204,6 +204,12 @@ class artigos
 				$sx .= '<BR>'.$keyword2;
 				$sx .= '</div>';
 				}
+				
+			$pags = trim($line['article_pages']);
+			if (strlen($pags) > 0)
+				{
+					$sx .= '<BR>p. '.$pags.'<BR>';
+				}
 
 			return($sx);
 		}	

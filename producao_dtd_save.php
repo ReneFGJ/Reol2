@@ -28,7 +28,8 @@ if ($dtd->exists_dtd_file($ged)==1)
 			}
 		fclose($rlt);
 	}
-	
+$sx = troca($sx,'[=-=]','&lt;');	
+
 $cited->protocolo = $ged->protocol;
 $sr = $cited->show_xml();
 /* Inser referencias */
