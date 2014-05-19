@@ -79,11 +79,25 @@ class parecer
 						 if ($dias <= 365) { $sa .= $dias.' dias'; }
 						 if ($dias > 365) { $sa .= number_format(round($dias*10/365)/10,1).' anos'; }
 						 }
-						else { $sa .= 'hoje'; }		
-					$livre = 'liberar declaração';
-					$sa .= '<TD class="tabela01" align="center">';
-					$slink = '<span class="link" onclick="newxy2(\'parecer_declaracao_liberar.php?dd0='.$line['id_pp'].'&dd1='.$this->tabela.'&dd90='.checkpost($line['id_pp'].$this->tabela).'\',300,300);" style="cursor: pointer;">';
-					$sa .= $slink.$livre.'</span>';
+						else { $sa .= 'hoje'; }
+					$sta = $line['pp_status'];
+					switch ($sta)
+						{
+						case 'B':
+							$livre = 'liberar declaração';
+							$sa .= '<TD class="tabela01" align="center">';
+							$slink = '<span class="link" onclick="newxy2(\'parecer_declaracao_liberar.php?dd0='.$line['id_pp'].'&dd1='.$this->tabela.'&dd90='.checkpost($line['id_pp'].$this->tabela).'\',300,300);" style="cursor: pointer;">';
+							$sa .= $slink.$livre.'</span>';
+							break;
+						case 'C':
+							$sa .= '<TD class="tabela01" align="center">'; 
+							$sa .= 'liberado para impressão';
+							break;
+						default:
+							$sa .= '<TD class="tabela01" align="center">';							
+							$sa .= 'outros '.$sta;
+							break;
+						}
 				}
 			$sa .= '</table>';
 			

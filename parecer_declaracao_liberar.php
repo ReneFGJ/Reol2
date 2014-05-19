@@ -29,8 +29,9 @@ $status = $line['status'];
 $email_1 = trim($line['us_email']);
 $email_2 = trim($line['us_email_alternativo']);
 $nome = '<B>'.trim($line['us_nome']).'</b>';
+$nome2 = trim($line['us_nome']);
 
-$jid = $line['us_journal_id'];
+$jid = round($line['us_journal_id']);
 
 $nw = $ic->ic('par_decl_avaliador');
 
@@ -62,11 +63,18 @@ $texto = troca($texto,'$LINK',$link);
 
 $texto = '<IMG SRC="'.$http.'/public/'.$jid.'/images/homeHeaderLogoImage.jpg">'.'<BR><BR>'.$texto;
 
-$sql = "update ".$pp->tabela." set pp_status = 'C' where id_pp = ".$dd[0];
-echo $sql;
+echo $texto;
 exit;
 
-enviaremail('renefgj@gmail.com','',$titulo,$texto);
+$sql = "update ".$pp->tabela." set pp_status = 'C' where id_pp = ".$dd[0];
+$rlt = db_query($sql);
+$titulo = trim($titulo).' '.trim($nome2);
+
+
+if (strlen($email_1) > 0) { enviaremail($email_1,'',$titulo,$texto); }
+if (strlen($email_2) > 0) { enviaremail($email_2,'',$titulo,$texto); }
+enviaremail($email_adm,'',$titulo.' [copias]',$texto.' <BR><BR>Enviado e-mail para '.$email_1.' '.$email_2);
+enviaremail('renefgj@gmail.com','',$titulo.' [copias]',$texto.' <BR><BR>Enviado e-mail para '.$email_1.' '.$email_2);
 
 require("close.php");
 ?>

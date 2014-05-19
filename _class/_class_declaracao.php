@@ -14,6 +14,8 @@ class declaracao
 					order by pp_parecer_data desc, pp_parecer_hora desc
 			";
 			//left join journals on pp_journal = id_journal_id
+			//inner join journals on doc_journal_id = jnl_codigo
+			echo $sql;
 			$rlt = db_query($sql);
 			$sx = '<table width="100%"> align="center"';
 			$sx .= '<TR><TH align="center" width="10%">Tipo
@@ -42,11 +44,28 @@ class declaracao
 		}
 	function link_declaracao($line)
 		{
-			$sx = '
-				<font style="background-color: #FFC0C0; padding: 0px 15px 0px 15px;"
-				<B>Indiponível, aguardando liberação</B>
-				</font>
-				';
+			$sta = $line['pp_status'];
+			switch ($sta)
+				{
+				case 'B':
+					$sx = '
+						<font style="background-color: #FFC0C0; padding: 0px 15px 0px 15px;"
+						<B>Indiponível, aguardando liberação</B>
+						</font>
+					';
+					break;
+				case 'C':
+					$proto = trim($line['pp_protocolo']);
+					$link = '<a href="'.$http.'/reol/editora/declaracao_emitir.php?dd0='.$proto.'&dd1='.$this->tabela.'&dd90='.checkpost($proto).'" target="_new">';
+					$sx = $link;
+					$sx .= '
+						<font style="background-color: #C0FFC0; padding: 0px 15px 0px 15px;"
+						<B>Liberado para impressão</B>
+						</font>
+					';
+					$sx .= '</A>';
+					break;
+				}
 			return($sx);
 		}
 	function mostra_status($sta)

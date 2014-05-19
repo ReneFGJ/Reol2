@@ -143,5 +143,43 @@ class ic
 				$line = db_read($rlt);
 				return($line);
 			}
-		
+	function ic_sel($journal,$id)
+		{
+			$jnid = strzero($journal,7);
+			$sql = "select * from ic_noticia where nw_ref='$id' 
+					and nw_journal = $jnid ";
+			$rlt = db_query($sql);
+			if ($line = db_read($rlt))
+				{
+					return($line['id_nw']);
+				} else {
+					$sql = "select * from ic_noticia where nw_ref='$id' ";
+					$rlt = db_query($sql);
+					if ($line = db_read($rlt))
+						{
+							$data = date("Ymd");
+							$titulo = trim($line['nw_titulo']);
+							$descricao = trim($line['nw_descricao']);
+							
+							$sql = "insert into ".$this->tabela."
+								(
+									nw_dt_cadastro, nw_secao, nw_link,
+									nw_fonte, nw_titulo, nw_descricao, 
+									nw_dt_de, nw_dt_ate, nw_log,
+									nw_ativo, nw_ref, nw_thema, 
+									nw_idioma, nw_journal, journal_id
+								) values (
+									$data,1,'',
+									'','$titulo','$descricao',
+									19000101,20500101,'',
+									1,'$id','',
+									'$idioma',$journal,$journal
+								)
+							";
+							$rlt = db_query($sql);
+						}
+					
+				}
+			return($sx);		
+		}
 	}
