@@ -15,16 +15,17 @@ class declaracao
 			";
 			//left join journals on pp_journal = id_journal_id
 			//inner join journals on doc_journal_id = jnl_codigo
-			echo $sql;
 			$rlt = db_query($sql);
-			$sx = '<table width="100%"> align="center"';
+			$sx = '<table width="100%" align="center">';
 			$sx .= '<TR><TH align="center" width="10%">Tipo
 						<TH align="center" width="10%">Protocolo
 						<TH align="center" width="20%">Estatus
 						<TH align="center" width="25%">Data e hora da avaliação
 						<TH align="center" width="25%">Situação';
+			$id = 0;
 			while ($line = db_read($rlt))
 				{
+					$id++;
 					$sx .= '<TR>';
 					$sx .= '<TD class="tabela01" align="center">';
 					$sx .= trim($line['pp_tipo']);
@@ -38,6 +39,10 @@ class declaracao
 					$sx .= trim($line['pp_parecer_hora']);
 					$sx .= '<TD class="tabela01" align="center">';
 					$sx .= $this->link_declaracao($line);																				
+				}
+			if ($id==0)
+				{
+					$sx .= '<TR><TD colspan=10>Nenuma avalição disponível';
 				}
 			$sx .= '</table>';
 			return($sx);

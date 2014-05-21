@@ -700,7 +700,7 @@ class submit
 		}	
 	function execute_L()
 		{
-			global $dd,$acao,$hd;
+			global $dd,$acao,$hd,$http;
 			$sx = '';
 			$sx = 'Enviando e-mail de aceit';
 			/* insere no hisetorico */
@@ -721,7 +721,7 @@ class submit
 					$editor = $hd->editor;
 					$title = $this->title;
 					
-					$mes = $this->ic("subm_B",1);
+					$mes = $this->ic("subm_L",1);
 					$ms = $mes[1];
 					$titulo = $mes[0];
 					
@@ -735,6 +735,12 @@ class submit
 					$ms = troca($ms,'$PROTOCOLO',$proto);
 					$ms = troca($ms,'$TITULO',$title);
 					$ms = troca($ms,'$EDITOR',$editor);
+					$ms = troca($ms,'$MOTIVOS','<B>'.$dd[4].'</B>');
+
+					$link = $http.'submissao/relacionamento_autor.php?dd0='.$this->protocolo.'&dd1='.checkpost($this->protocolo);
+					$link = '<a href="'.$link.'">'.$link.'</A>';
+					
+					$ms = troca($ms,'$LINK',$link);
 					
 					for ($r=0;$r < count($email);$r++)
 						{
