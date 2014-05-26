@@ -50,6 +50,7 @@ class declaracao
 	function link_declaracao($line)
 		{
 			$sta = $line['pp_status'];
+			$avaliador = $line['pp_avaliador'];
 			switch ($sta)
 				{
 				case 'B':
@@ -61,7 +62,7 @@ class declaracao
 					break;
 				case 'C':
 					$proto = trim($line['pp_protocolo']);
-					$link = '<a href="'.$http.'/reol/editora/declaracao_emitir.php?dd0='.$proto.'&dd1='.$this->tabela.'&dd90='.checkpost($proto).'" target="_new">';
+					$link = '<a href="'.$http.'/reol/editora/declaracao_emitir.php?dd0='.$proto.'&dd1='.$this->tabela.'&dd2='.$avaliador.'&dd90='.checkpost($proto).'" target="_new">';
 					$sx = $link;
 					$sx .= '
 						<font style="background-color: #C0FFC0; padding: 0px 15px 0px 15px;"

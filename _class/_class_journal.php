@@ -94,7 +94,7 @@ class journal
 				$opt = ' : ';
 				$opt .= '&J:Revista Cientifica';
 				$opt .= '&A:Anais de eventos';
-				
+						
 				array_push($cp,array('$H4','journal_id','journal_id',False,False,''));
 				array_push($cp,array('$A4','','Dados pessoais',False,True,''));
 				array_push($cp,array('$S200','jn_title','Título da publicação',True,True,''));
@@ -102,6 +102,7 @@ class journal
 				array_push($cp,array('$S150','editor','Nome do editor chefe',True,True,''));
 				array_push($cp,array('$T50:5','description','Descrição da publicação',False,True,''));
 				array_push($cp,array('$S30','path','Path',True,True,''));
+				array_push($cp,array('$S150','jnl_editor','Editora/Publicador',True,True,''));
 		
 				array_push($cp,array('$T60:8','jnl_html_cab','cabecalho',False,True,''));
 				array_push($cp,array('$T60:5','assinatura','Assinatura',True,True,''));

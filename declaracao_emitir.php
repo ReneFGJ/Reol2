@@ -20,9 +20,12 @@ $sql= "select * from submit_documento
 			inner join pareceristas on pp_avaliador = us_codigo
 			inner join journals on doc_journal_id = jnl_codigo 
 			where doc_protocolo = '".$id."'";
+
+/* Código do avaliador */			
+if (strlen($dd[2]) > 0) { $sql .= " and us_codigo = '".$dd[2]."' "; }
+
 $rlt = db_query($sql);
 $line = db_read($rlt);
-
 $status = $line['status'];
 
 $editor = $line['editor'];

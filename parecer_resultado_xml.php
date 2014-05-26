@@ -75,7 +75,7 @@ security();
 							echo '<BR>Avaliação:<B>';
 							if (strlen($q5) == 1)
 							{
-								if ($q5=='1') { echo 'SIM'; }
+								if ($q5=='0') { echo 'SIM'; }
 								else { echo '<font color="red">NÃO</font>'; }
 							} else {
 								echo $q5;

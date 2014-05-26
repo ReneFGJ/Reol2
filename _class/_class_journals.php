@@ -5,6 +5,7 @@ class journals
 		var $title;
 		var $path;
 		var $tabela = 'journals';
+		var $line;
 		
 		function cp_idiomas()
 			{
@@ -57,6 +58,10 @@ class journals
 				$opt .= '&R:Repositório Acadêmico';
 				$cp = array();
 				
+				$sql = "ALTER TABLE  journals ADD  jnl_editor CHAR(80)";
+				$rlt = db_query($sql);
+				
+				
 				array_push($cp,array('$H4','journal_id','journal_id',False,False,''));
 				array_push($cp,array('$A4','','Dados pessoais',False,True,''));
 				array_push($cp,array('$S200','jn_title','Título da publicação',True,True,''));
@@ -64,7 +69,8 @@ class journals
 				array_push($cp,array('$S150','editor','Nome do editor chefe',True,True,''));
 				array_push($cp,array('$T50:5','description','Descrição da publicação',False,True,''));
 				array_push($cp,array('$S30','path','Path',True,True,''));
-		
+				array_push($cp,array('$S150','jnl_editor','Editora/Publicador',True,True,''));
+				
 				array_push($cp,array('$T60:8','jnl_html_cab','cabecalho',False,True,''));
 				array_push($cp,array('$T60:5','assinatura','Assinatura',True,True,''));
 		
@@ -95,14 +101,15 @@ class journals
 		function le($id)
 			{
 				if (strlen($id) > 0)
-					{ $this->$journal_id = $id; }
-				$sql = "select * from ".$this->tabela." where journal_id = ".$this->$journal_id;
+					{ $this->journal_id = $id; }
+				$sql = "select * from ".$this->tabela." where journal_id = ".$this->journal_id;
 				$rlt = db_query($sql);
 				if ($line = db_read($rlt))
 					{
 						$this->journal_id = $line['journal_id'];
 						$this->path = $line['path'];
 						$this->title = $line['title'];
+						$this->line = $line;
 					}
 				return(1);
 			}

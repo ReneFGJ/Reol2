@@ -14,6 +14,7 @@ $cited = new cited;
 require("_class/_class_dtd_mark.php");
 $dtd = new dtd_mark;
 
+$id = 4763;
 
 echo $hd->menu();
 echo '<div id="conteudo">';

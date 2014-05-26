@@ -63,8 +63,7 @@ $texto = troca($texto,'$LINK',$link);
 
 $texto = '<IMG SRC="'.$http.'/public/'.$jid.'/images/homeHeaderLogoImage.jpg">'.'<BR><BR>'.$texto;
 
-echo $texto;
-exit;
+echo 'Declaração liberada e comunicado avaliador por e-mail';
 
 $sql = "update ".$pp->tabela." set pp_status = 'C' where id_pp = ".$dd[0];
 $rlt = db_query($sql);
