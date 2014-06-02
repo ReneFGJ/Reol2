@@ -1227,6 +1227,8 @@ class submit
 					array_push($sn,'X');
 					array_push($sn,'L');
 					array_push($sn,'N');
+					array_push($sn,'E');
+					//array_push($sn,'O');
 					break;					
 				case 'L': 
 					array_push($sn,'C');

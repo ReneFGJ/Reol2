@@ -273,7 +273,7 @@ class parecer
 					$sx .= '<TD class="tabela01" align="center">';		
 					$sx .= $this->show_status(trim($line['pp_status']));					
 					
-					$sta = $line['pp_status']=='B';
+					$sta = $line['pp_status'];
 					$sa = '';
 					if ($sta == 'B' or $sta == 'C')
 						{
@@ -339,6 +339,7 @@ class parecer
 				$sx .= $line['pp_hora'].':00';
 				$sx .= '<TD class="tabela01" align="center">';
 				$sx .= $link;
+				$sx .= '===';
 			}
 
 			$sql = "select * from ".$this->tabela." 
@@ -357,8 +358,7 @@ class parecer
 						{							
 							$check = checkpost($ida.$secu);
 							$linkc = ' onclick="$(\'#av'.$ida.'\').animate({ height:\'toggle\', },300);" ';
-							$sta = $link.'<font color="green" '.$linkc.' style="cursor: pointer;">Aberto</font></A>';
-							 
+							$sta = $link.'<font color="green" '.$linkc.' style="cursor: pointer;">Aberto</font></A>';							 
 						}
 					$sx .= '<TR valign="top" class="tabela01">';
 					$sx .= '<TD class="tabela01">'.$line['us_nome'];
@@ -373,7 +373,8 @@ class parecer
 					$sx .= '<TD class="tabela01" align="center">';
 					$sx .= $this->show_status(trim($line['pp_status']));
 					$link = '';
-					$sta = $line['pp_status']=='B';
+					$sta = $line['pp_status'];
+					
 					if ($sta == 'B' or $sta == 'C')
 						{
 							$sx .= '<TD align="center" class="tabela01">'.stodbr($line['pp_parecer_data']).' - '.$line['pp_parecer_hora'];
