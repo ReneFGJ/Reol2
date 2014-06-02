@@ -18,11 +18,16 @@ echo $hd->main_content('Artigos');
 $artigos->le($dd[0]);
 echo $artigos->mostra();
 
-echo '<BR><BR>';
+echo $artigos->mostra_protocolos_antigos();
+
+echo '<BR>';
+echo '<A HREF="dtd_xml.php?dd0='.$artigos->line['id_article'].'">DTD Xml</A>';
+echo '<BR>';
+
 echo $artigos->mostra_arquivos();
 echo $artigos->mostra_submit_post();
 
-echo $artigos->mostra_protocolos_antigos();
+
 
 echo '</div>';
 

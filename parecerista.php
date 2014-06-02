@@ -9,6 +9,8 @@ echo $hd->menu();
 echo '<div id="conteudo">';
 echo $hd->main_content('Pareceristas');
 
+echo '<A HREF="parecerista_lista.php">Lista de Pareceristas</A>';
+
 /* dados do parecerista */
 echo '<div style="float: left;">';
 echo $par->mostra_dados();

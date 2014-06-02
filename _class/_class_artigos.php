@@ -2,7 +2,6 @@
 class artigos
 	{
 		
-	var $tabela = 'articles';
 	var $line;
 	var $titulo;
 	var $titulo_alt;
@@ -17,11 +16,32 @@ class artigos
 	var $edicao;
 	var $mod;
 	var $ref;
+	var $protocolo_work;
+	
+	var $tabela = 'articles';
+	var $tabela_cited = "articles_cited";
+
+	function le_refs()
+		{
+			$protocolo = $this->protocolo_work;
+			$sql = "select * from ".$this->tabela_cited." 
+					where ac_protocolo = '$protocolo' 
+					order by ac_ord ";
+			$rlt = db_query($sql);
+			$ref = array();
+			while ($line = db_read($rlt))
+				{
+					array_push($ref,$line);
+				}
+			return($ref);
+		}
 	
 	function mostra_protocolos_antigos()
 		{
 			$proto_1 = $this->line['article_protocolo_original'];
 			$proto_2 = $this->line['article_protocolo_works'];
+			
+			$this->protocolo_work = $proto_2;
 			
 			$link = '<A HREF="producao_works_detalhe.php?dd0='.$proto_2.'">'.$proto_2.'</A>';
 			return($link);
